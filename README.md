@@ -1,8 +1,7 @@
-![](mdn.png)
+![](logo.png)
 
-# makedomainnames
-makedomainnames.com
 
+how to *make domain names*
  - add words 
  - get synonyms for each word 
  - shuffle the words together
