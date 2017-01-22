@@ -3,11 +3,12 @@
 
 module Main exposing (..)
 
-import Html exposing (div, img, h1, button, text, input, br)
-import Html.Attributes exposing (src, placeholder)
-import Html.Events exposing (onClick, onInput)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Http
-import Json.Decode exposing (..)
+import Json.Decode as JD
+import Json.Encode as JE
 
 
 main : Program Never Model Msg
@@ -18,50 +19,63 @@ main =
         , update = update
         , subscriptions = (\model -> Sub.none)
         }
-
-
-type alias Word =
-    { word : String
-    , nounSynonyms : List String
-    , verbSynonyms : List String
+type alias Word = 
+    { word: String
+    , synonyms: List String
     }
-
 
 type alias Model =
-    { words : List Word
-    , word : Word
+    { word1 : Word
+    , word2 : Word
+    , word3 : Word
     }
 
 
-type Msg
-    = FetchSynonyms
-    | NewSynonyms (Result Http.Error String)
-    | UpdateWords String
+
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model [] { word = "", nounSynonyms = [], verbSynonyms = [] }, Cmd.none )
+    ( Model {word="",synonyms=["1","2"]} {word="",synonyms=[]} {word="",synonyms=[]}
+    , Cmd.none )
 
 
 view : Model -> Html.Html Msg
 view model =
-    div []
-        [ h1 [] [ text "make domain names" ]
-        , input [ placeholder "enter a word", onInput UpdateWords ] []
-        , button [] [ text "add another word" ]
-        , button [ onClick FetchSynonyms ] [ text "Get Synonyms" ]
-        , br [] []
-        , br [] []
-        , ul [] [ li [] [ text "synonyms here" ] ]
-        ]
+    let 
+        synonymItem : String -> Html Msg
+        synonymItem s = 
+            li [] [text s]
 
+        styles = 
+            [("margin", "20px")
+            ,("font-family", "sans-serif")
+            ]
+    in
+        div [style styles]
+            [ h1 [] [ text "make domain names" ]
+            , input [ placeholder "enter a word", onInput UpdateWord1 ] []
+            
+            , ul [] (List.map synonymItem model.word1.synonyms)
+
+            --, input [ placeholder "enter a word", onInput UpdateWord2 ] []
+            --, p [] [text (toString model.word2.synonyms)]
+            --, input [ placeholder "enter a word", onInput UpdateWord3 ] []
+            --, p [] [text (toString model.word3.synonyms)]
+            ]
+
+type Msg
+    = FetchSynonyms
+    | NewSynonyms (Result Http.Error String)
+    | UpdateWord1 String
+    | UpdateWord2 String
+    | UpdateWord3 String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        FetchSynonyms ->
-            ( model, getSynonyms model.word )
+        UpdateWord1 s ->
+            ( model, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
@@ -83,8 +97,12 @@ update msg model =
 getSynonyms : String -> Cmd Msg
 getSynonyms word =
     let
+        apikey = 
+            ""
+
+        --TODO refactor this
         url =
-            "http://words.bighugelabs.com/api/2/apikey/" ++ (word ++ "/json")
+            "http://words.bighugelabs.com/api/2/" ++ (apikey ++ ("/" ++ (word ++ "/json")))
 
         request =
             Http.get url decodeWordsUrl
@@ -92,6 +110,6 @@ getSynonyms word =
         Http.send NewSynonyms request
 
 
-decodeWordsUrl : Decoder String
+decodeWordsUrl : JD.Decoder String
 decodeWordsUrl =
-    at [ "noun", "syn" ] string
+    JD.at [ "noun", "syn" ] JD.string

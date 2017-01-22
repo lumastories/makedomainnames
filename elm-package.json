@@ -1,7 +1,7 @@
 {
     "version": "0.0.1",
     "summary": "make domain names",
-    "repository": "https://github.com/lumastories/makedomainnames",
+    "repository": "https://github.com/lumastories/makedomainnames.git",
     "license": "",
     "source-directories": [
         "."
