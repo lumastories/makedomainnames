@@ -97,7 +97,7 @@ getSynonyms word =
     let
         
         apikey = 
-            ""
+            "c39392015eab9b931d9cea42724c20f2"
         
         
         url =
